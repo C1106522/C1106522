@@ -42,19 +42,18 @@ git branch	  	   (Display tree branch)
 git checkout NAMEOFBRANCH  (Access specific branch)
 git status	           (Display name of the selected branch)
 
-#Merger branches
+#Merger branches:
 git merge NAMEOFBRANCH			(Merge branch to the master branch)
 git branch -d NAMEOFBRANCH		(Delete the branch on your local machine)
 git push origin --delete NAMEOFBRANCH	(Delete branch your github online profile)
 git push origin master			(Upload the master branch which just got merged)
 
-#Delete online files from master branch:
+#Delete file from master branch:
+rm FILENAME.txt				(Delete file in the repository folder)
+git add FILENAME.txt			(Update the delete file status)
+git commit -m "Delete FILENAME.txt"	(Change need to be saved in the log)
+git push origin master			(Update your online master repository by deleting file)
 
-
-
-
-
-
-
-
-
+#To save Github username/password on you locate machine:
+git config credential.helper store	(Ask the yout local git to remember the user/password)
+git push origin master 			(Push will ask you one last tie user/password to register it)
