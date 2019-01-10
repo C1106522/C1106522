@@ -5,7 +5,7 @@ Write the description of your project
 
 If you want to add some code section: 
 
-<p><p>Put the code you want</p><p>
+<p> <p>Put the code you want</p> <p>
 
 
 To make a list:
@@ -17,4 +17,4 @@ To make a list:
 * Bullet
 * Points
 
-{Art Github] (https://github.com/C1106522)
+[Art Github] (https://github.com/C1106522)
