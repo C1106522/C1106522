@@ -5,7 +5,7 @@ Write the description of your project
 
 If you want to add some code section: 
 
-<p> <p>Put the code you want</p> <p>
+<p> <p>Put the code you want</p> </p>
 
 
 To make a list:
