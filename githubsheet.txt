@@ -1,0 +1,60 @@
+#TUTORIAL SUMMARY FROM TERMINAL:
+================================
+
+
+#Install Github:
+sudo apt install git-all
+
+
+#Git Repository Installation
+============================
+#Download the repository:
+git clone https://ADDRESSREPOSITORY.git
+
+#Add username & address
+git config --global user.name "ENTERNAME"
+git config --global user.email "name@email.com"
+===============================================
+
+
+#Working with github
+====================
+#Display tree branch:
+git branch
+
+#Display status of branch:
+git status
+
+#Add a new file or update file changes:
+git add FILENAME  	                               	(add * add all changes and creation)
+git commit -m "You always need to commit with comment"	(update your local repository)
+git push origin master	 				(update your online repository)
+
+#Display change log of the branch:
+git log 
+git log --pretty=oneline  (dh)
+
+#Create a new branch:
+git branch NAMEOFBRANCH
+
+#Acess to branches:
+git branch	  	   (Display tree branch)
+git checkout NAMEOFBRANCH  (Access specific branch)
+git status	           (Display name of the selected branch)
+
+#Merger branches
+git merge NAMEOFBRANCH			(Merge branch to the master branch)
+git branch -d NAMEOFBRANCH		(Delete the branch on your local machine)
+git push origin --delete NAMEOFBRANCH	(Delete branch your github online profile)
+git push origin master			(Upload the master branch which just got merged)
+
+#Delete online files from master branch:
+
+
+
+
+
+
+
+
+
