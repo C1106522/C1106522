@@ -90,6 +90,7 @@
 
       ! Pilar Case ========================================================================
       integer :: ipi,npil,play
+<<<<<<< HEAD
       integer,dimension(50) :: p_type,orientation
       double precision,dimension(50) :: p_nsect,p_nparts,p_ax,p_by!,axpil,bypil,cxpil,cypil,czpil
       double precision,dimension(50,50) :: p_sect,p_geomtype,p_cxsect,p_cysect,p_radsect
@@ -97,6 +98,15 @@
       integer,dimension(50,50) :: p_lmr,ipil
       double precision,dimension(100000,10,2) :: pilpts,xform,yform
       double precision,dimension(100000,10,2) :: nznpil,zipil,zepil,xpil,ypil,zpil
+=======
+      integer,dimension(50) :: p_nsect,p_type,orientation
+      double precision,dimension(50) :: p_nparts,p_ax,p_by
+      double precision,dimension(50,50) :: p_sect,p_geomtype,p_cxsect,p_cysect,p_radsect
+      double precision,dimension(50,50) :: p_djc,p_dkc,p_dr
+      integer,dimension(50,50) :: p_lmr,ipil
+      double precision,dimension(100000,10,5) :: pilpts,xform,yform
+      double precision,dimension(100000,10,5) :: nznpil,zipil,zepil,xpil,ypil,zpil
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       logical :: p_fullness     
       !====================================================================================
 
@@ -125,12 +135,17 @@
       use hub_var
       implicit none 
       
+<<<<<<< HEAD
       integer :: n,np,ng,ipts,iz,maxpts,maxsec
+=======
+      integer :: n,np,ng,ipts,iz,maxpts,maxsec,nn,ntran,totsect
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       double precision :: rec_h,rec_l
       
 
       call read_infile
        
+<<<<<<< HEAD
 !      call screen_display
       call tunnel_main
 
@@ -153,6 +168,22 @@
       do ipi=1,npil
 	call pilar_main
       end do
+=======
+      if(t_nsect.ne.0) call tunnel_main
+      
+      if(b_nsect.ne.0) call bulb_main
+      
+      ! Creating the geometry points for the pilars
+      if(npil.ne.0) then
+      WRITE(6,*) 
+      WRITE(6,*) 'PILAR GEOMETRY'
+      WRITE(6,*) '###############################################################################'
+      do ipi=1,npil
+	call pilar_main
+      end do
+      WRITE(6,*) '###############################################################################'
+      end if
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 
       ! Create the guide vanes geometry points
       do ng=1,nguide
@@ -160,18 +191,53 @@
       end do
            
       ! Printing on the screen the total number of points
+<<<<<<< HEAD
       totpts=0
       do ipart=1,b_nparts
 	totpts=totpts+ip(ipart)
       end do
+=======
+      totpts=0 ; totsect=0
+      do ipart=1,t_nsect-1
+	totpts=totpts+itun(ipart) ; totsect=totsect+itun(ipart)
+      end do
+      WRITE(6,'(X,a,I11)') 'Tunnel total points:',totsect
+      
+      totsect=0
+      do ipart=1,b_nparts
+	totpts=totpts+ip(ipart) ; totsect=totsect+ip(ipart)
+      end do
+      WRITE(6,'(X,a,I13)') 'Bulb total points:',totsect
+      
+      totsect=0 ; ipts=1
+      do ipi=1,npil ; do n=1,p_nsect(ipi) ; do i=1,ipil(n,ipi) ; do iz=1,nznpil(i,n,ipi)
+	totpts=totpts+ipts ; totsect=totsect+ipts
+      end do ; end do ; end do ; end do
+      WRITE(6,'(X,a,I12)') 'Pilar total points:',totsect
+      
+      totsect=0 ; ipts=1
+      do ng=1,nguide ; do ipart=1,ipg(ng)
+	totpts=totpts+ipts ; totsect=totsect+ipts
+      end do ; end do
+      WRITE(6,'(X,a,I7)') 'Guide vane total points:',totsect
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       write(6,*) '-----------------------------------------------------------------------'
       write(6,'(X,a,I9)') 'Total Geometry Points:', totpts
       write(6,*) '-----------------------------------------------------------------------'
 
 
+<<<<<<< HEAD
       !-----------------------------------------------------------------------------------
       ! OUPUT FILES
       ! ----------------------------------------------------------------------------------
+=======
+      !===================================================================================
+      ! OUPUT FILES
+      !===================================================================================
+      !Geometry file:
+      !-----------------------------------------------------------------------------------
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       if(t_nsect.ne.0) then
 !      print *, 'Enter name of the tunnel file:'
 !      read *,fn
@@ -179,6 +245,7 @@
       open(unit=19,file=fn)
 	if(fullness.eq..FALSE.) write(19,*) 'ZONE T=TCASE'
 	do i=1,itun(t_nsect)
+<<<<<<< HEAD
           write(19,112) casepts(i,1),casepts(i,2),casepts(i,3)
         end do
 !	if(fullness.eq..FALSE.) write(19,*) 'ZONE T=TTUN'
@@ -191,6 +258,21 @@
 	  end do
 	end do
       close(19)
+=======
+          write(19,200) casepts(i,1),casepts(i,2),casepts(i,3)
+        end do
+	if(fullness.eq..FALSE.) write(19,*) 'ZONE T=TTUN'
+        ipts=0
+	do n=1,t_nsect-1
+	  write(19,'(a,I1)') 'ZONE T=T_part',n
+	  do i=1,itun(n)
+	    ipts=ipts+1
+            write(19,200) tubpts(ipts,1),tubpts(ipts,2),tubpts(ipts,3)
+	  end do
+	end do
+      close(19)
+      WRITE(6,*) 'Tunnel output file written'
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end if
       
       if(b_nsect.ne.0) then
@@ -198,6 +280,7 @@
       write(20,*) 'ZONE T=BULB'
 	ipts=0
 	Do ipart=1,b_nparts
+<<<<<<< HEAD
 	  WRITE(6,'(a,I5)') 'ip:',ip(ipart) 
           do i=1,ip(ipart)
 	  ipts=ipts+1
@@ -205,6 +288,16 @@
 	  end do
 	End do
       close(20)
+=======
+          do i=1,ip(ipart)
+	  ipts=ipts+1
+          write(20,200) bulpts(ipts,1,ipart),bulpts(ipts,2,ipart),bulpts(ipts,3,ipart)
+	  end do
+	End do
+      WRITE(6,*) 'Bulb output file written'
+      close(20)
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end if
 
       if(npil.ne.0) then
@@ -214,17 +307,26 @@
 	  ipts=0
 	  do i=1,ipil(n,ipi) ; do iz=1,nznpil(i,n,ipi)
 	    ipts=ipts+1
+<<<<<<< HEAD
 	    WRITE(21,112) xpil(ipts,n,ipi),ypil(ipts,n,ipi),zpil(ipts,n,ipi)
 	  end do ; end do
 	  WRITE(6,'(a,I5)') 'ipts pilat.dat:',ipts
         End do ; end do
       close(21)
+=======
+	    WRITE(21,200) xpil(ipts,n,ipi),ypil(ipts,n,ipi),zpil(ipts,n,ipi)
+	  end do ; end do
+        End do ; end do
+      close(21)
+      WRITE(6,*) 'Pilar output file written'
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end if
 
       if(nguide.ne.0) then
       open(unit=22,file='nacablade.dat')
       write(22,*) 'ZONE T=NACA'
       do ipart=1,nguide
+<<<<<<< HEAD
 	print *, 'ipg(ipart):', ipg(ipart)
         do i=1,ipg(ipart)
           write(22,112) xnaca(i,ipart),ynaca(i,ipart),znaca(i,ipart)
@@ -235,6 +337,70 @@
 
       112 format(3F25.7)
 
+=======
+        do i=1,ipg(ipart)
+          write(22,200) xnaca(i,ipart),ynaca(i,ipart),znaca(i,ipart)
+	end do
+      end do 
+      close(22)
+      WRITE(6,*) 'Guide and Blade output files written'
+      end if
+
+200   format(3F25.7)
+
+      !-----------------------------------------------------------------------------------
+      !Post-processing file:
+      !-----------------------------------------------------------------------------------
+      if(t_nsect.ne.0) then
+      open(unit=23,file='tunnel_spec.txt')
+      write(23,*) 'Tunnel specication:'
+      write(23,*) 'Variables:'
+      write(23,201) 'n','type','cxsect','cysect','czsect','radsect','heighsect','basesect', &
+    &		  'djc','dkc','dr','dh','db','dxx','dyy','dzz'
+      write(23,'(I4,a)') t_nsect, 'Sections'
+      write(23,*)
+
+      do n=1,t_nsect
+      dxx=dx/t_lmr(n) ; dyy=dy/t_lmr(n) ; dzz=dz/t_lmr(n)
+      if(t_geomtype(n).eq.1) then
+	t_height(n)=0 ; t_base(n)=0 ; t_dh(n)=0 ; t_db(n)=0
+      else if(t_geomtype(n).eq.2) then
+	t_radsect(n)=0 ; t_dr(n)=0
+      end if
+      write(23,202) n,t_geomtype(n),t_cxsect(n),t_cysect(n),t_czsect(n),t_radsect(n), &
+     &  t_height(n),t_base(n),t_djc(n),t_dkc(n),t_dr(n),t_dh(n),t_db(n),dxx,dyy,dzz   
+      end do
+      
+      ntran=0
+      do n=1,t_nsect-1
+	if(t_geomtype(n).ne.t_geomtype(n+1)) ntran=ntran+1
+	if(t_geomtype(n).eq.t_geomtype(n+1) .and. t_geomtype(n).eq.3) ntran=ntran+1
+      end do
+      
+      write(23,'(I4,a)') ntran, 'Transistional Sections'
+      write(23,*) 
+
+      do n=1,t_nsect-1
+      if(t_geomtype(n).ne.t_geomtype(n+1) .or. (t_geomtype(n).eq.3 .and. &
+     &   t_geomtype(n).eq.t_geomtype(n+1))) then
+	nn=n*10+(n+1)
+	write(23,*) 
+	write(23,'(a,I4)') 'Transistion section:',nn
+	write(23,203) 'edge','tran_sect(X)','tran_sect(Y)','tran_egde(X)','tran_edge(Y)'
+	do i=1,9
+	  write(23,204) i,tran_sect(i,1,n),tran_sect(i,2,n),tran_edge(i,1,n),tran_edge(i,2,n)
+	end do
+      end if
+      end do
+      close(23)
+      end if 
+      
+
+201   format(2a5,14a15)
+202   format(2I5,14F15.8)
+203   format(a6,4a20)
+204   format(I6,4F20.8)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end program
 !#########################################################################################
 !#########################################################################################
@@ -300,7 +466,10 @@
       do n=1,p_nsect(ipi)
       temp_cxsect(n)  = p_cxsect(n,ipi)  ; temp_dr(n)  = p_dr(n,ipi)  
       temp_cysect(n)  = p_cysect(n,ipi)  ; temp_djc(n) = p_djc(n,ipi) 
+<<<<<<< HEAD
 !      temp_czsect(n)  = p_czsect(n,ipi)  ; temp_dkc(n) = p_dkc(n,ipi) 
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       temp_radsect(n) = p_radsect(n,ipi) ; temp_lmr(n) = p_lmr(n,ipi)
       end do
 
@@ -310,7 +479,10 @@
       do n=1,p_nsect(ipi)
       p_cxsect(n,ipi)  = temp_cxsect(n)  ; p_dr(n,ipi)  = temp_dr(n) 
       p_cysect(n,ipi)  = temp_cysect(n)  ; p_djc(n,ipi) = temp_djc(n)
+<<<<<<< HEAD
 !      p_czsect(n,ipi)  = temp_czsect(n) ; p_dkc(n,ipi) = temp_dkc(n)
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       p_radsect(n,ipi) = temp_radsect(n) ; p_lmr(n,ipi) = temp_lmr(n)
       end do
 
@@ -327,6 +499,7 @@
       integer :: nl,nlim,m,is,ib,b,n,j,i2,j2
       double precision :: dist
 
+<<<<<<< HEAD
       WRITE(6,*) 'Enterered lmr part, section:'
       
       if(cas.eq.1) then
@@ -339,6 +512,18 @@
 	end if
       end do
       end if
+=======
+!      if(cas.eq.1) then
+!      do nl=1,temp_nsect-1
+!	if(temp_geomtype(nl).eq.1 .and. temp_geomtype(nl+1).eq.2) then
+!	  WRITE(6,'(I3,F10.5)') nl, temp_geomtype(nl)
+!	  do i2=1,8
+!	    write(6,'(2F10.5)') temp_tran_sect(i2,1,nl) , temp_tran_sect(i2,2,nl)
+!	  end do
+!	end if
+!     end do
+!      end if
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 
       nlim=temp_nsect
       do i=1,nzone
@@ -351,6 +536,7 @@
 	       temp_cysect(m)=temp_cysect(m-1)
 	       temp_czsect(m)=temp_czsect(m-1)
 	       temp_radsect(m)=temp_radsect(m-1)
+<<<<<<< HEAD
 	       temp_djc(m)=temp_djc(m-1)
 	       temp_dkc(m)=temp_dkc(m-1)
 	       temp_dr(m)=temp_dr(m-1)
@@ -358,12 +544,23 @@
 	       temp_height(m)=temp_height(m-1)
 	       temp_base(m)=temp_base(m-1)
 	       temp_dh(m)=temp_dh(m-1)
+=======
+	       temp_height(m)=temp_height(m-1)
+	       temp_base(m)=temp_base(m-1)
+	       temp_djc(m)=temp_djc(m-1)
+	       temp_dkc(m)=temp_dkc(m-1)
+	       temp_dr(m)=temp_dr(m-1)
+               temp_dh(m)=temp_dh(m-1)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	       temp_db(m)=temp_db(m-1)
 	       do i2=1,8 ; do j2=1,2
 	       temp_tran_sect(i2,j2,m)=temp_tran_sect(i2,j2,m-1)
 	       temp_tran_edge(i2,j2,m)=temp_tran_edge(i2,j2,m-1)
 	       end do ; end do 
+<<<<<<< HEAD
 	       END IF
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	     end do
 	     nlim=nlim+1
 	     dist=xlmr(i,1)-temp_cxsect(nl)
@@ -372,14 +569,20 @@
 	     temp_cysect(is)=temp_cysect(nl)+temp_djc(is)*dist
 	     temp_czsect(is)=temp_czsect(nl)+temp_dkc(is)*dist
 	     temp_radsect(is)=temp_radsect(nl)+temp_dr(is)*dist
+<<<<<<< HEAD
 	     IF(cas.eq.1) THEN
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	     temp_height(is)=temp_height(nl)+temp_dh(is)*dist
 	     temp_base(is)  =temp_base(nl)+temp_db(is)*dist
 	     do i2=1,8 ; do j2=1,2
 	       temp_tran_edge(i2,j2,is)=tran_edge(i2,j2,nl)
 	       temp_tran_sect(i2,j2,is)=tran_sect(i2,j2,nl)+temp_tran_edge(i2,j2,is)*dist
 	     end do ; end do
+<<<<<<< HEAD
 	     END IF
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	  end if
 	end do
       end do
@@ -402,6 +605,7 @@
 	end if
       end do ; end do 
 
+<<<<<<< HEAD
       do nl=1,temp_nsect-1
 	if(temp_geomtype(nl).eq.3 .and. temp_geomtype(nl+1).eq.2) then
 	  WRITE(6,'(I3,F10.5)') nl, temp_geomtype(nl)
@@ -410,20 +614,38 @@
 	  end do
 	end if
       end do
+=======
+!      do nl=1,temp_nsect-1
+!	if(temp_geomtype(nl).eq.3 .and. temp_geomtype(nl+1).eq.2) then
+!	  WRITE(6,'(I3,F10.5)') nl, temp_geomtype(nl)
+!	  do i2=1,8
+!	    write(6,'(2F10.5)') temp_tran_sect(i2,1,nl) , temp_tran_sect(i2,2,nl)
+!	  end do
+!	end if
+!      end do
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       END IF
 
       ! TEST -----------------------------------------------------------------------------
 !       do nl=1,temp_nsect
+<<<<<<< HEAD
 !       write(6,758) nl,temp_geomtype(nl),temp_cxsect(nl),temp_dh(nl), &
 !      &             temp_db(nl),temp_height(nl),temp_base(nl),temp_lmr(nl)
 !       end do
 !       do nl=1,temp_nsect
 !       write(6,758) nl,temp_geomtype(nl),temp_cxsect(nl),temp_dr(nl),temp_djc(nl),temp_dkc(nl)
+=======
+!       write(6,100) nl,temp_geomtype(nl),temp_cxsect(nl),temp_dr(nl),temp_djc(nl),temp_dkc(nl)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 !       end do        
 !       write(6,*) '=================================================================='
       !----------------------------------------------------------------------------------- 
       
+<<<<<<< HEAD
 758   format(2I3,5F10.5,I3)
+=======
+100   format(2I3,5F10.5,I3)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end subroutine
 !=========================================================================================		    
 
@@ -440,15 +662,25 @@
       integer :: m,m_inc,j
       double precision :: A,B,C,D,y1,y2,y3,z1,z2,z3
       double precision, dimension(3,2) :: pt
+<<<<<<< HEAD
 
       SELECT CASE(cas)
+=======
+      
+      SELECT CASE(cas)
+	! Tunnel transition case:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	Case(1)
 	m_inc=2
 	pt(ic,1)=edge(ic,1)     ; pt(ic,2)=edge(ic,2)
 	pt(ic+1,1)=edge(ic+1,1) ; pt(ic+1,2)=edge(ic+1,2)
 	pt(ic+2,1)=edge(ic+2,1) ; pt(ic+2,2)=edge(ic+2,2)
 
+<<<<<<< HEAD
 
+=======
+	! Bulb front case:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	Case(2)
 	m_inc=1
 	do j=1,2
@@ -462,15 +694,24 @@
 	pt(2,1)=pt(1,1) + (pt(3,1)-pt(1,1))/2 
 	pt(2,2)=pt(1,2) + (pt(3,2)-pt(1,2))/2 + bsize(nd)
 
+<<<<<<< HEAD
+=======
+	! Bulb donut case:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	Case(3)
 	m_inc=1
 	pt(1,1)=b_cxsect(n+1) ; pt(1,2)=b_czsect(n+1)+b_radsect(n+1)  
 	pt(2,1)=b_cxsect(n)   ; pt(2,2)=b_czsect(n) 
 	pt(3,1)=b_cxsect(n+1) ; pt(3,2)=b_czsect(n+1)-b_radsect(n+1)
+<<<<<<< HEAD
 	do m=1,3
 	WRITE(6,'(a,I3,3F10.5)') 'Case 3 pt:', m, pt(m,1), pt(m,2) 
 	end do
 
+=======
+
+	! Pilar front case:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	Case(4)
 	m_inc=1
 	pt(ic,1)  =p_cxsect(n+1,ipi) ; pt(ic,2)  =p_cysect(n+1,ipi)+p_radsect(n+1,ipi)
@@ -479,6 +720,10 @@
 
       END SELECT
 
+<<<<<<< HEAD
+=======
+      ! Solves the linear equations system to find the roots:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       y1=pt(ic,1)   ; z1=pt(ic,2) 
       y2=pt(ic+1,1) ; z2=pt(ic+1,2) 
       y3=pt(ic+2,1) ; z3=pt(ic+2,2)      
@@ -488,6 +733,10 @@
       D=(y1**2+z1**2)*(y3*z2-y2*z3)+(y2**2+z2**2)*(y1*z3-y3*z1)+(y3**2+z3**2)*(y2*z1-y1*z2)
       B=B/A ; C=C/A ; D=D/A ; A=1
       
+<<<<<<< HEAD
+=======
+      ! Calculates the center location of the circle and its radius:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       if(cas.eq.1) then
 	axe=2 ; inc=1 ; ec(axe,ic)=-(B/2*A) ; ec(axe+inc,ic)=-(C/2*A)
 	cr(ic)=sqrt((ec(axe,ic)-y1)**2+(ec(axe+inc,ic)-z1)**2)
@@ -498,7 +747,12 @@
 	axe=1 ; inc=1 ; ec(axe,ic)=-(B/2*A) ; ec(axe+inc,ic)=-(C/2*A)
 	cr(ic)=sqrt((ec(axe,ic)-y1)**2+(ec(axe+inc,ic)-z1)**2)
       end if
+<<<<<<< HEAD
 
+=======
+      
+      ! Calculates the angle value of the three points on the circle:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       do m=ic,ic+2,m_inc
 	if(pt(m,1).ge.ec(axe,ic) .and. pt(m,2).ge.ec(axe+inc,ic)) then
 	  angle(m)=atan((pt(m,2)-ec(axe+inc,ic))/(pt(m,1)-ec(axe,ic)))
@@ -514,15 +768,25 @@
 	end if
       end do
       
+<<<<<<< HEAD
       if(cas.eq.1) then
 	alpha=angle(ic+2)-angle(ic)
 	if(ic.eq.7) alpha=angle(ic+2)+2*pi-angle(ic)
 !        WRITE(6,'(a,f10.5)') 'alpha:', alpha 
+=======
+      ! Calculates the relative angle created by the three points:
+      if(cas.eq.1) then
+	alpha=angle(ic+2)-angle(ic)
+	if(ic.eq.7) alpha=angle(ic+2)+2*pi-angle(ic)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end if
       if(cas.eq.2) alpha=angle(ic)-angle(ic+2)
       if(cas.eq.3 .or. cas.eq.4) alpha=angle(ic+1)-angle(ic)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end subroutine
 !=========================================================================================
 
@@ -542,19 +806,40 @@
       t_vertice(3,1)=tyi ; t_vertice(3,2)=tzi
       t_vertice(4,1)=tye ; t_vertice(4,2)=tze
 
+<<<<<<< HEAD
       do n=1,t_nsect-1
+=======
+      ! Calculates the tunnel derivative accounting for slopes and changes between sections
+      do n=1,t_nsect-1
+	! Circle part: (Circle section -> Circle section
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	IF(t_geomtype(n).eq.1 .and. t_geomtype(n+1).eq.t_geomtype(n)) THEN
           t_djc(n)=(t_cysect(n+1)-t_cysect(n))/(t_cxsect(n+1)-t_cxsect(n))
           t_dkc(n)=(t_czsect(n+1)-t_czsect(n))/(t_cxsect(n+1)-t_cxsect(n))
           t_dr(n) =(t_radsect(n+1)-t_radsect(n))/(t_cxsect(n+1)-t_cxsect(n))
+<<<<<<< HEAD
+=======
+	
+	! Square part: (Square section -> Square section)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	ELSE IF(t_geomtype(n).eq.2 .and. t_geomtype(n+1).eq.t_geomtype(n)) THEN
 	  t_djc(n)=(t_cysect(n+1)-t_cysect(n))/(t_cxsect(n+1)-t_cxsect(n))
           t_dkc(n)=(t_czsect(n+1)-t_czsect(n))/(t_cxsect(n+1)-t_cxsect(n))
  	  t_dh(n) =(t_height(n+1)-t_height(n))/(t_cxsect(n+1)-t_cxsect(n))
 	  t_db(n) =(t_base(n+1)-t_base(n))/(t_cxsect(n+1)-t_cxsect(n))
+<<<<<<< HEAD
 	ELSE IF(t_geomtype(n).ne.t_geomtype(n+1) .or. (t_geomtype(n).eq.t_geomtype(n+1) .and.    &
      &        t_geomtype(n).eq.3)) THEN
 	  DO nn=n,n+1
+=======
+	
+	! Transition part: (Circle section -> Square section - visversa)
+	ELSE IF(t_geomtype(n).ne.t_geomtype(n+1) .or. (t_geomtype(n).eq.t_geomtype(n+1) .and.    &
+     &        t_geomtype(n).eq.3)) THEN
+	  DO nn=n,n+1
+	  
+	  ! Circle Section Calculation:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	  if(t_geomtype(nn).eq.1) then	  
 	    do i=1,8
 	      ang=45*i
@@ -564,6 +849,11 @@
 	      tran_sect(i,1,nn)=t_cysect(nn) + t_radsect(nn)*dcos(loc(t_sect(nn),i))
 	      tran_sect(i,2,nn)=t_czsect(nn) + t_radsect(nn)*dsin(loc(t_sect(nn),i))
 	    end do
+<<<<<<< HEAD
+=======
+	  
+	  ! Square Section Calculation:  
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	  else if(t_geomtype(nn).eq.2) then
 	    tran_sect(1,1,nn)=t_cysect(nn)+t_base(nn)/2
 	    tran_sect(1,2,nn)=t_czsect(nn)+t_height(nn)/2
@@ -581,6 +871,11 @@
 	    tran_sect(7,2,nn)=t_czsect(nn)-t_height(nn)/2
 	    tran_sect(8,1,nn)=t_cysect(nn)+t_base(nn)/2
 	    tran_sect(8,2,nn)=t_czsect(nn)
+<<<<<<< HEAD
+=======
+	  
+	  ! Oval Section Calculation:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	  else if(t_geomtype(nn).eq.3) then
 	    !small rec:
 	    tran_sect(1,1,nn)=t_cysect(nn)+t_base(nn)/2
@@ -591,7 +886,11 @@
 	    tran_sect(5,2,nn)=t_czsect(nn)-t_height(nn)/2
 	    tran_sect(7,1,nn)=t_cysect(nn)+t_base(nn)/2
 	    tran_sect(7,2,nn)=t_czsect(nn)-t_height(nn)/2
+<<<<<<< HEAD
 	    !big rec:
+=======
+	    !Big rectangle:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	    tran_sect(2,1,nn)=t_cysect(nn)
 	    tran_sect(2,2,nn)=t_oczsect(nn)+t_oheight(nn)/2
 	    tran_sect(4,1,nn)=t_ocysect(nn)-t_obase(nn)/2
@@ -600,19 +899,30 @@
 	    tran_sect(6,2,nn)=t_oczsect(nn)-t_oheight(nn)/2
 	    tran_sect(8,1,nn)=t_ocysect(nn)+t_obase(nn)/2
 	    tran_sect(8,2,nn)=t_czsect(nn)
+<<<<<<< HEAD
 	    do i=1,8
 	      WRITE(6,'(a,I3,2F10.5)') 'Edge:',i,tran_sect(i,1,nn),tran_sect(i,2,nn)
 	    end do
+=======
+!	    do i=1,8
+!	      WRITE(6,'(a,I3,2F10.5)') 'Edge:',i,tran_sect(i,1,nn),tran_sect(i,2,nn)
+!	    end do
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	  end if
 	  END DO
 	END IF
 	
+<<<<<<< HEAD
 	! Create the edge function from connecting the points from circular to rectangular section:
+=======
+	! Create the edge function to connect points from circular to rectangular section:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	do i=1,8
 	  tran_edge(i,1,n)=(tran_sect(i,1,n+1)-tran_sect(i,1,n))/(t_cxsect(n+1)-t_cxsect(n))
 	  tran_edge(i,2,n)=(tran_sect(i,2,n+1)-tran_sect(i,2,n))/(t_cxsect(n+1)-t_cxsect(n))
 	end do
       end do
+<<<<<<< HEAD
 
       do i=1,t_nsect-1
 	WRITE(6,'(I3,4F20.5)') t_sect(i), t_dh(i), t_db(i), t_height(i), t_base(i)
@@ -628,6 +938,36 @@
       WRITE(6,*) 't_nsect after lmr', t_nsect
       ipts=0
       m=0
+=======
+      
+      ! Create subsections to the tunnel sections when lmr region's not conjunting with tunnel section:
+      call lmr_resolution(1) 
+      
+      ! Print out those these sections:
+      WRITE(6,*) 
+      write(6,*) 'TUNNEL GEOMETRY'
+      WRITE(6,*) '###############################################################################'
+      WRITE(6,'(X,a)') 'Tunnel Specification'
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+      WRITE(6,107) 'n','cx','cy','cz','rad','h','b','djc','dkc','dr','dh','db','lmr'
+      do n=1,t_nsect
+      WRITE(6,101) n,t_cxsect(n),t_cysect(n),t_czsect(n),t_radsect(n),t_height(n),t_base(n), &
+     &		   t_djc(n),t_dkc(n),t_dr(n),t_dh(n),t_db(n),t_lmr(n)
+      end do
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+107   format(a4,11a8,a6)
+101   format(I4,11F8.4,I6)
+  
+      ! Assign the sections in between which the tunnel case needs to be created:
+      xitc=txi+tlay*(dx/t_lmr(1))         
+      xetc=txe-tlay*(dx/t_lmr(t_nsect-1)) 
+      
+      ! Call the subroutine that calculates and store the case point:
+      call tunnel_case
+
+      ! Algorithm that calls corresponding subroutines to create and store the points of different part type:
+      ipts=0 ; m=0
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       DO n=1,t_nsect-1
         ipsect=0
 	dxx=dx/t_lmr(n) ; dyy=dy/t_lmr(n) ; dzz=dz/t_lmr(n)
@@ -640,8 +980,15 @@
 	ELSE IF (t_geomtype(n).eq.3 .and. t_geomtype(n).eq.t_geomtype(n+1)) THEN
 	  call transition_part(n,ipts,ipsect)
 	END IF
+<<<<<<< HEAD
 	WRITE(6,*)  itun(n)
       END DO
+=======
+	write(6,102) 'Tunnel Part:',n,'/',t_nsect-1,' written || Points:', itun(n) 
+      END DO
+      WRITE(6,*) '###############################################################################'
+102   format(X,a12,I4,a1,I4,a19,I5)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end subroutine
 
 !-----------------------------------------------------------------------------------------
@@ -651,13 +998,22 @@
       implicit none
 
       integer :: itc,jtc,ktc,it,l,n,ix,lmax
+<<<<<<< HEAD
       
+=======
+    
+      ! Initialise the maximum of layer for the case:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       if(fullness.eq..TRUE.) then
 	lmax=1
       else
 	lmax=tlay
       end if
 
+<<<<<<< HEAD
+=======
+      ! Calculates and store the points that fill the case region:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       it=0
       DO l=1,lmax ; Do n=1,t_nsect-1
         dxx=dx/t_lmr(n) ; dyy=dy/t_lmr(n) ; dzz=dz/t_lmr(n) 
@@ -704,7 +1060,10 @@
       integer :: ix,lmax,l
       double precision :: distmax,nalpha,r
  
+<<<<<<< HEAD
       WRITE(6,'(a,I4)') 'Enterered circular part, section:', n
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       nxn=nint((t_cxsect(n+1)-t_cxsect(n))/dxx)
       if(nxn.eq.0) nxn=1
       do ix=1,nxn
@@ -713,7 +1072,11 @@
 	t_kc=t_czsect(n) + t_dkc(n)*(ix-1)*dxx
 	rval=t_radsect(n) + t_dr(n)*(ix-1)*dxx
 	
+<<<<<<< HEAD
 	! Calculater the number of layer required 
+=======
+	! Calculater the number of layer required based on the fullness of the section:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	IF((fullness.eq..FALSE. .and. (xval.lt.xitc .or. xval.ge.xetc)) .or. &
      &	    fullness.eq..TRUE.)THEN
 	  vertice(1,1)=t_jc+rval*dcos(pi/4)   ; vertice(1,2)=t_kc+rval*dsin(pi/4)
@@ -729,7 +1092,11 @@
 	  lmax=tlay
 	END IF
 
+<<<<<<< HEAD
 	! Calculate and store the points of the circles within the tunnel boundary
+=======
+	! Calculate and store the points of the circles within the tunnel boundary:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	DO l=1,lmax
 	r=rval+(l-1)*dyy
 	nalpha=nint(2*pi*r/dyy)
@@ -756,20 +1123,37 @@
 
       integer,intent(in) :: n
       integer,intent(inout) :: ipts,ipsect
+<<<<<<< HEAD
       integer :: it,ix,jtc,ktc,j,k
+=======
+      integer :: it,ix,jtc,ktc,j,k,is
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       double precision :: yi,ye,zi,ze,distmax
       double precision, dimension(100000) :: ytemp,ztemp
       integer :: l,lmax,itemp,i2
       
+<<<<<<< HEAD
       WRITE(6,'(a,I4)') 'Enterered rectangular part, section:', n
       nxn=nint((t_cxsect(n+1)-t_cxsect(n))/dxx)
       if(nxn.eq.0) nxn=1
       DO ix=1,nxn
+=======
+      nxn=nint((t_cxsect(n+1)-t_cxsect(n))/dxx) ; is=1
+      if(nxn.eq.0) nxn=1
+      if(t_geomtype(n-2).ne.2) is=0
+      if(t_geomtype(n+2).ne.2) nxn=nxn+1
+      DO ix=is,nxn
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	itemp=0
         xval=t_cxsect(n) + (ix-1)*dxx
 	t_jc=t_cysect(n) + t_djc(n)*(ix-1)*dxx ; t_kc=t_czsect(n) + t_dkc(n)*(ix-1)*dxx
 	t_h =t_height(n) + t_dh(n)*(ix-1)*dxx  ; t_b =t_base(n) + t_db(n)*(ix-1)*dxx
+<<<<<<< HEAD
 	! Calculates the number of layer required
+=======
+
+	! Calculates the number of layer required based on the fullness of the section:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	IF((fullness.eq..FALSE. .and. (xval.lt.xitc .or. xval.ge.xetc)) .or. &
      &	    (fullness.eq..TRUE.))THEN
 	  ! FULLSECTION.FACE
@@ -788,7 +1172,11 @@
 	  lmax=tlay
 	END IF
 	
+<<<<<<< HEAD
 	! Calculate the position of each point and store them in the point scatter matrix
+=======
+	! Calculate the position of each point and store them in the point scatter matrix:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	DO l=1,lmax
 	yi =t_jc-(t_b/2+(l-1)*dyy)  ; ye =t_jc+(t_b/2+(l-1)*dyy)
 	zi =t_kc-(t_h/2+(l-1)*dzz)  ; ze =t_kc+(t_h/2+(l-1)*dzz)
@@ -824,7 +1212,10 @@
       END DO
       itun(n)=ipsect
 
+<<<<<<< HEAD
       WRITE(6,*) n,itun(n)
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end subroutine
 	
 !-----------------------------------------------------------------------------------------
@@ -835,12 +1226,17 @@
 
       integer, intent(in) :: n
       integer, intent(inout) :: ipts,ipsect
+<<<<<<< HEAD
       integer :: nn,j,ix,iy,iz,nyn,nzn,lmax,l,m,ic
+=======
+      integer :: nn,j,ix,iy,iz,nyn,nzn,lmax,l,m,ic,is
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       double precision :: theta,yinit,ylast,ytemp,zinit,zlast,ztemp,ti,te,dt!,alpha
       double precision :: ri,re,dr,y1,y2,y3,z1,z2,z3
       double precision :: A,B,C,D
       logical :: circle
 
+<<<<<<< HEAD
 	! Calculate and store all the point of the different ellipse: 
 	nxn=(t_cxsect(n+1)-t_cxsect(n))/dxx
 	do ix=1,nxn
@@ -900,14 +1296,82 @@
 	  do t=1,nthet
 	    ipts=ipts+1
 	    ipsect=ipsect+1
+=======
+      ! Calculate and store all the point of the different ellipse: 
+      nxn=(t_cxsect(n+1)-t_cxsect(n))/dxx ; is=1
+      if(t_geomtype(n).eq.2) is=2
+      if(t_geomtype(n+1).eq.2) nxn=nxn-1
+      do ix=is,nxn
+      xval=t_cxsect(n)+(ix-1)*dxx
+
+      ! Set up the number of layer required based on the fullness of the section:
+      IF((fullness.eq..FALSE. .and. (xval.lt.xitc .or. xval.ge.xetc)) .or. &
+     &	  fullness.eq..TRUE.)THEN
+	do nn=n,n+1
+	  if(t_geomtype(nn).eq.1) then
+	    ttj=nint((tye-tyi)/dyy) ; ttk=nint((tze-tzi)/dzz)
+	    if(ttj.ge.ttk) then
+	      ri=0 ; re=2*tye ; dr=dyy
+	    else
+	      ri=0 ; re=2*tze ; dr=dzz
+	    end if
+	    lmax=nint((re-ri)/dr)
+	  end if
+        end do
+      ELSE
+	lmax=tlay
+      END IF 
+      
+      ! Calculates the points location of the edges forming the four ellipse of each x section:
+      do l=1,lmax
+	edge(1,1)=tran_sect(1,1,n) + tran_edge(1,1,n)*(ix-1)*dxx + (l-1)*dyy
+	edge(1,2)=tran_sect(1,2,n) + tran_edge(1,2,n)*(ix-1)*dxx + (l-1)*dzz
+	
+	edge(2,1)=tran_sect(2,1,n) + tran_edge(2,1,n)*(ix-1)*dxx
+	edge(2,2)=tran_sect(2,2,n) + tran_edge(2,2,n)*(ix-1)*dxx + (l-1)*dzz
+	
+	edge(3,1)=tran_sect(3,1,n) + tran_edge(3,1,n)*(ix-1)*dxx - (l-1)*dyy
+	edge(3,2)=tran_sect(3,2,n) + tran_edge(3,2,n)*(ix-1)*dxx + (l-1)*dzz
+	
+	edge(4,1)=tran_sect(4,1,n) + tran_edge(4,1,n)*(ix-1)*dxx - (l-1)*dyy
+	edge(4,2)=tran_sect(4,2,n) + tran_edge(4,2,n)*(ix-1)*dxx
+	
+	edge(5,1)=tran_sect(5,1,n) + tran_edge(5,1,n)*(ix-1)*dxx - (l-1)*dyy
+	edge(5,2)=tran_sect(5,2,n) + tran_edge(5,2,n)*(ix-1)*dxx - (l-1)*dzz
+	
+	edge(6,1)=tran_sect(6,1,n) + tran_edge(6,1,n)*(ix-1)*dyy
+	edge(6,2)=tran_sect(6,2,n) + tran_edge(6,2,n)*(ix-1)*dxx - (l-1)*dzz
+	
+	edge(7,1)=tran_sect(7,1,n) + tran_edge(7,1,n)*(ix-1)*dxx + (l-1)*dyy
+	edge(7,2)=tran_sect(7,2,n) + tran_edge(7,2,n)*(ix-1)*dxx - (l-1)*dzz
+	
+	edge(8,1)=tran_sect(8,1,n) + tran_edge(8,1,n)*(ix-1)*dxx + (l-1)*dyy
+	edge(8,2)=tran_sect(8,2,n) + tran_edge(8,2,n)*(ix-1)*dxx
+        
+	edge(9,1)=edge(1,1) ; edge(9,2)=edge(1,2)
+          
+	do ic=1,7,2	  
+	  ! Call the three points circle solver to find its center location and radius
+	  call three_pt_circle_sol(1,n,0,ic)
+	  
+	  ! Calculates and store the points of the circle section representing the ellipse:
+	  nthet=nint(alpha*cr(ic)/dyy)
+	  dt=alpha/nthet
+	  do t=1,nthet
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	    theta=angle(ic)+(t-1)*dt
 	    if(theta.gt.2*pi) theta=theta-2*pi
 	    yval=ec(axe,ic)+cr(ic)*dcos(theta)
 	    zval=ec(axe+inc,ic)+cr(ic)*dsin(theta)
 	    IF(yval.gt.yitc .and. yval.lt.yetc) THEN
 	      if(zval.gt.zitc .and. zval.lt.zetc) then
+<<<<<<< HEAD
               ipts=ipts+1 ; tubpts(ipts,1)=xval ; tubpts(ipts,2)=yval ; tubpts(ipts,3)=zval
 	      ipsect=ipsect+1
+=======
+              ipts=ipts+1 ; ipsect=ipsect+1
+	      tubpts(ipts,1)=xval ; tubpts(ipts,2)=yval ; tubpts(ipts,3)=zval
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	      end if
 	    END IF
 	  end do
@@ -945,6 +1409,7 @@
       else 
 	b_lmr=1
       end if
+<<<<<<< HEAD
 
       ! Screen display the radius slope---------------------------------------------------
       ipart=0
@@ -953,6 +1418,22 @@
 	write(6,'(X,a,I3,X,a,F5.3)') 'Part:',n, 'Radius Slope:', b_dr(n)
       end do 
       write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+=======
+      
+      ! Bulb Specification
+      WRITE(6,*) 
+      WRITE(6,*) 'BULB GEOMETRY'
+      WRITE(6,*) '###############################################################################'
+      WRITE(6,'(X,a)') 'Bulb Specification'
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+      WRITE(6,108) 'n','cxsect','cysect','czsect','radsect','djc','dkc','dr','lmr'
+      do n=1,b_nsect
+      WRITE(6,103) n,b_cxsect(n),b_cysect(n),b_czsect(n),b_radsect(n),b_djc(n),b_dkc(n),b_dr(n),b_lmr(n)
+      end do
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+108   format(a4,7a10,a6)
+103   format(I4,7F10.5,I6)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 
       ! Calculates and store the points of the bulb case----------------------------------
       ipts=0
@@ -1002,7 +1483,10 @@
 	do l=1,nlay
 	rval=rad(nr)-(l-1)*dzz
 	nthet=nint(2.d0*pi*rval/dyy)
+<<<<<<< HEAD
 !	WRITE(6,'(a,2F10.3,2I5)') 'xval,rval,nthet:',xval,rval,nthet,nmax
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	IF(b_fullness.eq..FALSE. .and. b_cxsect(n+1).eq.b_cxsect(b_nsect)  &
      &	    .and. ix.ge.nxn-nlay .and. ix.le.nxn .and. b_radsect(n+1).gt.0 .and. l.eq.1) THEN
 	  call closing_face(n,ipts,isect,b_jc,b_kc)
@@ -1025,9 +1509,16 @@
 	END IF
 	end do
         End Do
+<<<<<<< HEAD
       ip(n)=isect ; write(6,111) 'Part:',n,'/',b_nparts,'written || Points:', ip(n) 
       END DO
       111 format(X,a,X,I2,X,a,I2,X,a,I6)
+=======
+      ip(n)=isect ; write(6,104) 'Bulb Part:',n,'/',b_nparts,'written || Points:', ip(n) 
+      END DO
+      WRITE(6,*) '###############################################################################'
+104   format(X,a,X,I2,X,a,I2,X,a,I6)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 
       end subroutine
 
@@ -1043,8 +1534,16 @@
       double precision :: axl_val,azl_val,dt,theta,xlast,rtemp!,alpha
 
       ic=1 ; xlast=0
+<<<<<<< HEAD
       call three_pt_circle_sol(cas,n,nd,ic)
       
+=======
+
+      ! Call the 3 points circle creation solver to get its center location and radius
+      call three_pt_circle_sol(cas,n,nd,ic)
+      
+      ! Calculates the radius of the bulb front/donut points 
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       nthet=nint(alpha*cr(ic)/(dx/(b_lmr(n)*100)))
       dt=alpha/nthet
       do t=1,nthet
@@ -1057,7 +1556,10 @@
 	  rtemp=azl_val ; xlast=abs(xval-axl_val)
 	else if(t.gt.1 .and. abs(xval-axl_val).le.xlast) then
 	  rtemp=azl_val ; xlast=abs(xval-axl_val)
+<<<<<<< HEAD
 !	  if(nd.eq.1)  WRITE(6,'(2F10.5)') rtemp,xlast
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	end if
       end do
       if(b_geomtype(n).eq.1) rval=rtemp
@@ -1076,9 +1578,14 @@
       double precision, intent(in) :: b_jc,b_kc
       double precision :: r
       
+<<<<<<< HEAD
       WRITE(6,*) b_cxsect(n+1), xval
       nrn=nint(rval/(dy/b_lmr(n)))
       WRITE(6,*) nrn
+=======
+      ! Calculates and store the points that compose the face of a cilynder:
+      nrn=nint(rval/(dy/b_lmr(n)))
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       do ir=2,nrn
 	r=rval-(ir-1)*(dy/b_lmr(n))
 	nthet=nint(2.d0*pi*r/(dy/b_lmr(n)))
@@ -1098,6 +1605,11 @@
       end do
 
       end subroutine 
+<<<<<<< HEAD
+=======
+!=========================================================================================
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 
 
 ! PILAR GEOMETRY
@@ -1113,6 +1625,7 @@
       double precision :: b_jc,b_kc,r,opp,abscis,theta
       double precision,dimension(1000) :: rad
       
+<<<<<<< HEAD
       
             
       
@@ -1125,11 +1638,22 @@
 !	p_dkc(n,ipi)=(p_czsect(n+1,ipi)-p_czsect(n,ipi))/(p_cxsect(n+1,ipi)-p_cxsect(n,ipi))
 	p_dr(n,ipi)=(p_radsect(n+1,ipi)-p_radsect(n,ipi))/(p_cxsect(n+1,ipi)-p_cxsect(n,ipi))
 	WRITE(6,998) p_cxsect(n,ipi),p_cysect(n,ipi),p_radsect(n,ipi),p_djc(n,ipi),p_dr(n,ipi)
+=======
+      ! Calculates and store radius slope
+      if(p_type(ipi).eq.2) then
+      do n=1,p_nsect(ipi)-1
+	p_djc(n,ipi)=(p_cysect(n+1,ipi)-p_cysect(n,ipi))/(p_cxsect(n+1,ipi)-p_cxsect(n,ipi))
+	p_dr(n,ipi)=(p_radsect(n+1,ipi)-p_radsect(n,ipi))/(p_cxsect(n+1,ipi)-p_cxsect(n,ipi))
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end do
       p_nparts(ipi)=p_nsect(ipi)-1
       end if
 
+<<<<<<< HEAD
       ! Initialise the lmr resolution of each bulb section--------------------------------
+=======
+      ! Initialise the lmr resolution of each bulb section
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       if(LRM.eq..TRUE.) then
 	call lmr_resolution(3)
       else
@@ -1137,11 +1661,28 @@
 	p_lmr(n,ipi)=1
 	end do
       end if
+<<<<<<< HEAD
      
+=======
+ 
+      ! Pilar Specification
+      WRITE(6,*)
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+      WRITE(6,'(I4,a)') ipi, ' Pilar Specification'
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+      do n=1,p_nsect(ipi)
+      WRITE(6,105) n,p_cxsect(n,ipi),p_cysect(n,ipi),p_radsect(n,ipi),p_djc(n,ipi),p_dr(n,ipi),p_lmr(n,ipi)
+      end do
+      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+105   format(I4,5F10.5,I4)
+
+      ! Algorithm that calculates the points location composing the pilar 2D geometrical form: 
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       DO n=1,p_nsect(ipi)-1
       ipts=0 ; isect=0 ; nr=0
       dxx=dx/p_lmr(n,ipi) ; dyy=dy/p_lmr(n,ipi) ; dzz=dz/p_lmr(n,ipi)
       nxn=nint((p_cxsect(n+1,ipi)-p_cxsect(n,ipi))/dxx)
+<<<<<<< HEAD
       do ix=1,nxn
 	xval=p_cxsect(n,ipi) + (ix-1)*dxx
 	p_jc=p_cysect(n,ipi) + p_djc(n,ipi)*(ix-1)*dxx
@@ -1152,6 +1693,18 @@
 	if(p_geomtype(n,ipi).eq.2) call pil_ellipse(4,n,p_jc)
 
 	! Calculates the number of layers required
+=======
+      if(n.eq.p_nsect(ipi)-1) nxn=nxn+1
+      do ix=1,nxn
+	xval=p_cxsect(n,ipi) + (ix-1)*dxx
+	p_jc=p_cysect(n,ipi) + p_djc(n,ipi)*(ix-1)*dxx
+	
+	! Calculates the radius of the section:
+	if(p_geomtype(n,ipi).eq.1) rval=p_radsect(n,ipi) + p_dr(n,ipi)*(ix-1)*dxx
+	if(p_geomtype(n,ipi).eq.2) call pil_ellipse(4,n,p_jc)
+
+	! Calculates the number of layers required based on the fullness of the bulb:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	nr=nr+1 ; rad(nr)=rval
 	if(nr.gt.1 .and. abs(rad(nr)-rad(nr-1).ge.play*dyy)) then
 	  nlay=nint(abs(rad(nr)-rad(nr-1))/dyy) ; inlay=nlay
@@ -1166,6 +1719,10 @@
 	  nlay=play
 	end if
 
+<<<<<<< HEAD
+=======
+        ! Calculates and store the points composing the pilar 2D form:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	do l=1,nlay
 	rval=rad(nr)-(l-1)*dyy
 	nthet=nint(2*rval/dyy)
@@ -1190,6 +1747,7 @@
 	END IF
 	end do
       end do
+<<<<<<< HEAD
       WRITE(6,'(a,2I5)') 'ipts,isect',ipts,isect 
       ipil(n,ipi)=isect
       WRITE(6,222) 'Pilar:',ipi,'  Section:',n,'  Npoints:',ipil(n,ipi)
@@ -1198,6 +1756,12 @@
 
 222   format(a6,I3,a11,I3,a11,I5)
 
+=======
+      ipil(n,ipi)=isect
+      END do
+
+      ! Generate a file with the 2D pilar form:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       open(unit=81,file='pilar_form.dat')
       ipts=0
       do n=1,p_nsect(ipi)-1
@@ -1205,6 +1769,7 @@
 	ipts=ipts+1
 	write(81,'(2F10.5)') xform(i,n,ipi),yform(i,n,ipi)
       end do ; end do
+<<<<<<< HEAD
       WRITE(6,'(a,I5)') 'Pilar_form pts:',ipts
       close(81)
 
@@ -1213,6 +1778,15 @@
       DO n=1,p_nsect(ipi)-1 ; DO i=1,ipil(n,ipi)
 	ipts=ipts+1 ; xcor=xform(i,n,ipi) ; ycor=yform(i,n,ipi)
 !	WRITE(6,'(I4,2F10.5)') ipts,xcor,ycor 
+=======
+      close(81)
+
+      ! Algorithm that calculates the distance between the bulb and the tunnel for each point forming
+      ! the 2D form. Subsequently, fills this gap with evenly space points.
+      ipts=0
+      DO n=1,p_nsect(ipi)-1 ; DO i=1,ipil(n,ipi)
+	ipts=ipts+1 ; xcor=xform(i,n,ipi) ; ycor=yform(i,n,ipi)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	
 	! Calculate the starting point from the bulb turbine for each point of the pilar 2D form:
 	do ib=1,b_nsect-1
@@ -1245,16 +1819,24 @@
 	      dist=xcor-t_cxsect(it)
 	      t_kc=t_czsect(it)+t_dkc(it)*dist ; t_h=(t_height(it)+t_dh(it)*dist)/2
 	      zepil(i,n,ipi)=t_kc+t_h*orientation(ipi)
+<<<<<<< HEAD
 !	      WRITE(6,'(5F10.5)') t_czsect(it),t_kc,t_height(it)/2,t_dh(it),zepil(i,n,ipi)
+=======
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
     
 	    ! Transitional tunnel part:
 	    else if(t_geomtype(it).ne.t_geomtype(it+1) .or. (t_geomtype(it).eq.t_geomtype(it+1) &
      &		    .and. t_geomtype(it).eq.3)) then
 	      dist=xcor-t_cxsect(it)
+<<<<<<< HEAD
 !	      WRITE(6,'(a,3F10.5)') 'xcor,t_cxsect(it),dist:',xcor,t_cxsect(it),dist
 	      if(orientation(ipi).eq.1) then
 		 mi=1 ; me=3 ; ic=mi
 		 
+=======
+	      if(orientation(ipi).eq.1) then
+		 mi=1 ; me=3 ; ic=mi	 
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	      else
 		 mi=5 ; me=7 ; ic=mi
 	      end if
@@ -1262,6 +1844,7 @@
 	      do m=mi,me
 		edge(m,1)=tran_sect(m,1,it) + tran_edge(m,1,it)*dist
 		edge(m,2)=tran_sect(m,2,it) + tran_edge(m,2,it)*dist
+<<<<<<< HEAD
 !		WRITE(6,'(2I4,5F15.8)') n,m,tran_sect(m,1,it),tran_edge(m,1,it),dist,edge(m,1)
 	      end do
 
@@ -1274,15 +1857,32 @@
 	      r=cr(ic) ; abscis=abs(ycor-ec(axe,ic)) ; opp=sqrt(r**2-abscis**2)
 	      zepil(i,n,ipi)=ec(axe+inc,ic) + opp *orientation(ipi)
 !	      WRITE(6,'(4F10.5)') r,abscis,opp,zepil(i,n,ipi)
+=======
+	      end do
+
+	      call three_pt_circle_sol(1,it,0,ic)
+	
+	      r=cr(ic) ; abscis=abs(ycor-ec(axe,ic)) ; opp=sqrt(r**2-abscis**2)
+	      zepil(i,n,ipi)=ec(axe+inc,ic) + opp *orientation(ipi)
+!	      theta=acos((ycor-ec(axe,ic))/cr(ic))
+!	      zepil(i,n,ipi)=ec(axe+inc,ic)+cr(ic)*dsin(theta)
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 	    end if
 	  end if
 	end do
 	ze=zepil(i,n,ipi)
 	nzn=nint((ze-zi)/dzz)
+<<<<<<< HEAD
 !	WRITE(6,'(I4,2F10.5,I4,2F10.5)') ipts,zi,ze,nzn,xcor,ycor
       END DO ; END DO
 
 
+=======
+      END DO
+      END DO
+      
+      ! Algorithm section that fill the gap with points:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       do n=1,p_nsect(ipi)-1 
 	ipts=0
 	do i=1,ipil(n,ipi)
@@ -1293,6 +1893,7 @@
 	  xpil(ipts,n,ipi)=xform(i,n,ipi)
 	  ypil(ipts,n,ipi)=yform(i,n,ipi)
 	  zpil(ipts,n,ipi)=zipil(i,n,ipi)+(iz-1)*z_inc
+<<<<<<< HEAD
 !	  WRITE(6,'(2I6,3F10.5)') n,ipts,xpil(ipts,n,ipi),ypil(ipts,n,ipi),zpil(ipts,n,ipi)
 	end do
       end do ; end do
@@ -1321,6 +1922,17 @@
 
 
       end subroutine
+=======
+	end do
+        end do
+        write(6,106) 'Pilar Part:',n,'/',p_nsect(ipi),' written || Points:', ipts
+106     format(X,a11,I4,a1,I4,a19,I7)
+      end do
+!      write(6,*) '~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~'
+
+      end subroutine
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 !-----------------------------------------------------------------------------------------
       subroutine pil_ellipse(cas,n,p_jc)
 !----------------------------------------------------------------------------------------
@@ -1333,10 +1945,18 @@
       double precision :: axl_val,ayl_val,dt,theta,rtemp,xlast
 
       ic=1 ; xlast=0
+<<<<<<< HEAD
       call three_pt_circle_sol(4,n,0,ic)
 
       nthet=nint(alpha*cr(ic)/(dxx/100))
 !      WRITE(6,'(a,F10.5,I5)') 'pilar alpha,nthet',alpha,nthet
+=======
+      ! Calculates the center location and radius of the circle created from 3 points:
+      call three_pt_circle_sol(4,n,0,ic)
+
+      ! Fill with points the relative angle created by the three points:
+      nthet=nint(alpha*cr(ic)/(dxx/100))
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       dt=alpha/nthet
       do t=1,nthet
 	theta=angle(ic+1)-(t-1)*dt
@@ -1350,9 +1970,15 @@
 	end if
       end do
       rval=rtemp-p_jc
+<<<<<<< HEAD
 !      WRITE(6,'(a,3F10.5)') 'rtemp,p_jc,rval:',rtemp,p_jc,rval
 
       end subroutine
+=======
+
+      end subroutine
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 !-----------------------------------------------------------------------------------------
       subroutine pil_full_sect(n,ipts,isect,p_jc)
 !-----------------------------------------------------------------------------------------
@@ -1365,6 +1991,10 @@
       integer :: ir,nrn
       double precision :: r,dr
       
+<<<<<<< HEAD
+=======
+      ! Full the section with point when pilar fullness is required:
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       nrn=nint(2*rval/dyy)
       dr=2*rval/nrn
       if(nrn.eq.0) then
@@ -1373,16 +2003,28 @@
 	yform(ipts,n,ipi)=p_jc
       else
       do ir=1,nrn
+<<<<<<< HEAD
       r=rval-(ir-1)*dr
       ipts=ipts+1 ; isect=isect+1
       xform(ipts,n,ipi)=xval
       yform(ipts,n,ipi)=p_jc+r
+=======
+        r=rval-(ir-1)*dr
+	ipts=ipts+1 ; isect=isect+1
+	xform(ipts,n,ipi)=xval
+	yform(ipts,n,ipi)=p_jc+r
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
       end do
       end if
 
       end subroutine
 !=========================================================================================
 
+<<<<<<< HEAD
+=======
+
+
+>>>>>>> b1e0e456d6e4edebbf2d7286a0600245ea9ff470
 ! GUIDE VANES GEOMETRY
 !=========================================================================================
 !-----------------------------------------------------------------------------------------
